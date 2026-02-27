@@ -2024,9 +2024,9 @@
                      }
                  })
                  .then(data => {
-                     if (data && data.success && data.formData) {
-                         console.log("Loaded data:", data.formData);
-                         for (const [key, value] of Object.entries(data.formData)) {
+                     if (data && data.success && data.data) {
+                         console.log("Loaded data:", data.data);
+                         for (const [key, value] of Object.entries(data.data)) {
                              const elements = form.querySelectorAll(`[name="${key}"]`);
                              if (elements.length > 0) {
                                  elements.forEach(element => {
@@ -2062,7 +2062,7 @@
             // --- Event Listeners ---
 
             // Next Buttons
-            document.querySelectorAll('.btn-next').forEach(button => {
+            document.querySelectorAll('.nav-btn-next').forEach(button => {
                 button.addEventListener('click', function() {
                     const currentSectionNum = parseInt(this.id.split('-')[1]);
                     console.log(`Next button clicked for section ${currentSectionNum}`);
