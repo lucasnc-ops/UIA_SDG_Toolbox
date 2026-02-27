@@ -8,11 +8,18 @@ echo "===================="
 
 # Wait for database to be ready
 echo "Waiting for database..."
+MAX_RETRIES=${DB_WAIT_RETRIES:-10}
+RETRIES=0
 until nc -z "${DB_HOST:-db}" "${DB_PORT:-5432}" 2>/dev/null; do
-  echo "Database is unavailable - sleeping"
-  sleep 1
+  RETRIES=$((RETRIES + 1))
+  if [ "$RETRIES" -ge "$MAX_RETRIES" ]; then
+    echo "Could not reach database after $MAX_RETRIES attempts — proceeding anyway."
+    break
+  fi
+  echo "Database is unavailable - sleeping ($RETRIES/$MAX_RETRIES)"
+  sleep 2
 done
-echo "Database is up!"
+echo "Database is up (or skipped wait)!"
 
 # Run migrations with timeout
 echo "Running database migrations..."
