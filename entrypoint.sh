@@ -23,6 +23,7 @@ echo "Database is up (or skipped wait)!"
 
 # Run migrations with timeout
 echo "Running database migrations..."
+export FLASK_APP=run
 timeout 60 flask db upgrade || {
     echo "Migration failed or timed out"
     exit 1
