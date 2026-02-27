@@ -4,11 +4,12 @@ Optimized for VPS-1 (2 vCPU, 4GB RAM)
 """
 
 import multiprocessing
+import os
 
 # Worker processes
-# Production: (CPU cores × 2) + 1, capped at 8
+# Production: (CPU cores × 2) + 1, capped at 4 (Railway has fewer CPUs)
 cpu_count = multiprocessing.cpu_count()
-workers = min(cpu_count * 2 + 1, 8)
+workers = int(os.environ.get('WEB_CONCURRENCY', min(cpu_count * 2 + 1, 4)))
 
 # Use threaded workers for better I/O performance
 worker_class = "gthread"
@@ -28,19 +29,18 @@ reload = False
 preload_app = True  # Share code between workers
 
 # Performance tuning
-worker_tmp_dir = '/dev/shm'  # Use shared memory
 sendfile = True
 reuse_port = True
 backlog = 2048
 
 # Logging
-loglevel = "warning"
+loglevel = "info"
 accesslog = "-"  # Log to stdout
 errorlog = "-"   # Log to stderr
 access_log_format = '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"'
 
 # Server mechanics
-bind = "0.0.0.0:5000"
+bind = f"0.0.0.0:{os.environ.get('PORT', '5000')}"
 daemon = False
 pidfile = None
 umask = 0
