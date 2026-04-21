@@ -506,12 +506,12 @@
                         <li class="nav-item">
                             <a class="nav-link {% if request.blueprint in ['projects','questionnaire','dashboard'] %}active{% endif %}"
                                href="{{ url_for('projects.index') if current_user.is_authenticated else url_for('auth.login') }}">
-                                Commissions
+                                My Projects
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {% if request.endpoint == 'main.sdg_information_hub' %}active{% endif %}"
-                               href="{{ url_for('main.sdg_information_hub') }}">SDG Hub</a>
+                               href="{{ url_for('main.sdg_information_hub') }}">UN 17 SDGs</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {% if request.endpoint == 'main.faq' %}active{% endif %}"

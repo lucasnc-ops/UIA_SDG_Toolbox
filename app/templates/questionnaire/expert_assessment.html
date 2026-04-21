@@ -1,13 +1,11 @@
-<!DOCTYPE html>
-<html lang="{{ request.accept_languages.best_match(['en', 'fr']) or 'en' }}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-translate-key="page_title">SDG Expert Assessment - {{ project.name }}</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <style>
+{% extends "base.html" %}
+{% block title %}Expert Assessment — {{ project.name }}{% endblock %}
+{% block head %}
+{{ super() }}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<style>
         body { background-color: #f8fafc; }
         .sdg-section { border-top-width: 4px; }
         .sdg-indicator-btn.active { transform: scale(1.1); box-shadow: 0 0 0 2px white, 0 0 0 4px var(--tw-ring-color); }
@@ -107,30 +105,31 @@
             .sdg-section { box-shadow: none !important; border: 1px solid #e2e8f0; margin-bottom: 1.5rem; page-break-inside: avoid; }
         }
     </style>
-</head>
-<body class="bg-slate-100 font-sans">
-    <header class="bg-green-800 text-white p-5 shadow-xl fixed w-full top-0 z-50 no-print">
-        <div class="container mx-auto flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <i class="fas fa-tasks text-3xl"></i>
-                <div>
-                    <h1 class="text-2xl lg:text-3xl font-bold tracking-tight" data-translate-key="header_title">SDG Expert Assessment Tool</h1>
-                    <p class="text-sm opacity-90" data-translate-key="header_subtitle">Sustainable Architecture & Urban Planning Framework</p>
-                </div>
+{% endblock %}
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb" class="py-3">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('projects.index') }}">My Projects</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('projects.show', id=project.id) }}">{{ project.name }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Expert Assessment</li>
+    </ol>
+</nav>
+{% endblock %}
+{% block content %}
+<div class="container-lg mb-3">
+    <div class="row">
+        <div class="col-12 col-lg-10 offset-lg-2">
+            <div class="mb-2">
+                <h1 class="page-title mb-0" style="text-transform: none; font-size: 2rem;">Expert Assessment — {{ project.name }}</h1>
             </div>
-            <div class="flex items-center space-x-3">
-                <button type="button" id="auto-fill-btn" class="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-white font-medium rounded-md transition duration-150 ease-in-out border border-yellow-500" data-translate-key="auto_fill_button">Auto-fill Test Data</button>
-                <div class="flex space-x-3 text-sm">
-                    <button type="button" class="lang-btn px-4 py-2 bg-green-700 hover:bg-green-600 text-white font-medium rounded-md transition duration-150 ease-in-out border border-green-600" onclick="setLanguage('en')" data-lang="en">English</button>
-                    <button type="button" class="lang-btn px-4 py-2 bg-green-700 hover:bg-green-600 text-white font-medium rounded-md transition duration-150 ease-in-out border border-green-600" onclick="setLanguage('fr')" data-lang="fr">Français</button>
-                </div>
-            </div>
+            {% include "partials/_lang_switcher.html" %}
         </div>
-    </header>
-
-    <main class="container mx-auto p-4 md:p-6 lg:p-8" style="margin-top: 100px;">
+    </div>
+</div>
+<div class="container-lg px-3">
         <!-- Progress tracker -->
-        <div id="progress-container" class="bg-white p-6 rounded-lg shadow-md mb-8 sticky z-40 no-print border border-slate-200" style="top: 90px;">
+        <div id="progress-container" class="bg-white p-6 rounded-lg shadow-md mb-8 sticky z-40 no-print border border-slate-200" style="top: 1rem;">
              <div class="flex justify-between items-center mb-3">
                 <h2 class="text-xl font-semibold text-slate-700" data-translate-key="progress_title">Assessment Progress</h2>
                 <span id="progress-text" class="text-emerald-700 font-bold text-lg">SDG 1 of 17</span>
@@ -184,7 +183,7 @@
                     <!-- Navigation -->
                     <div class="form-navigation-wrapper">
                         <div class="form-navigation" style="justify-content: flex-end;">
-                            <button type="button" class="nav-btn-base nav-btn-next" data-next="sdg-2">
+                            <button type="button" class="nav-btn-base nav-btn-next next-btn" data-next="sdg-2">
                                 <span data-translate-key="continue_button">Continue to SDG 2</span>
                                 <i class="fas fa-arrow-right"></i>
                             </button>
@@ -232,11 +231,11 @@
                      <!-- Navigation -->
                      <div class="form-navigation-wrapper">
                          <div class="form-navigation">
-                             <button type="button" class="nav-btn-base nav-btn-prev" data-prev="sdg-1">
+                             <button type="button" class="nav-btn-base nav-btn-prev prev-btn" data-prev="sdg-1">
                                  <i class="fas fa-arrow-left"></i>
                                  <span data-translate-key="back_button">Back to SDG 1</span>
                              </button>
-                             <button type="button" class="nav-btn-base nav-btn-next" data-next="sdg-3">
+                             <button type="button" class="nav-btn-base nav-btn-next next-btn" data-next="sdg-3">
                                  <span data-translate-key="continue_button">Continue to SDG 3</span>
                                  <i class="fas fa-arrow-right"></i>
                              </button>
@@ -290,11 +289,11 @@
                      <!-- Navigation -->
                      <div class="form-navigation-wrapper">
                          <div class="form-navigation">
-                             <button type="button" class="nav-btn-base nav-btn-prev" data-prev="sdg-2">
+                             <button type="button" class="nav-btn-base nav-btn-prev prev-btn" data-prev="sdg-2">
                                  <i class="fas fa-arrow-left"></i>
                                  <span data-translate-key="back_button">Back to SDG 2</span>
                              </button>
-                             <button type="button" class="nav-btn-base nav-btn-next" data-next="sdg-4">
+                             <button type="button" class="nav-btn-base nav-btn-next next-btn" data-next="sdg-4">
                                  <span data-translate-key="continue_button">Continue to SDG 4</span>
                                  <i class="fas fa-arrow-right"></i>
                              </button>
@@ -342,11 +341,11 @@
                     <!-- Navigation -->
                     <div class="form-navigation-wrapper">
                         <div class="form-navigation">
-                            <button type="button" class="nav-btn-base nav-btn-prev" data-prev="sdg-3">
+                            <button type="button" class="nav-btn-base nav-btn-prev prev-btn" data-prev="sdg-3">
                                 <i class="fas fa-arrow-left"></i>
                                 <span data-translate-key="back_button">Back to SDG 3</span>
                             </button>
-                            <button type="button" class="nav-btn-base nav-btn-next" data-next="sdg-5">
+                            <button type="button" class="nav-btn-base nav-btn-next next-btn" data-next="sdg-5">
                                 <span data-translate-key="continue_button">Continue to SDG 5</span>
                                 <i class="fas fa-arrow-right"></i>
                             </button>
@@ -400,11 +399,11 @@
                      <!-- Navigation -->
                      <div class="form-navigation-wrapper">
                          <div class="form-navigation">
-                             <button type="button" class="nav-btn-base nav-btn-prev" data-prev="sdg-4">
+                             <button type="button" class="nav-btn-base nav-btn-prev prev-btn" data-prev="sdg-4">
                                  <i class="fas fa-arrow-left"></i>
                                  <span data-translate-key="back_button">Back to SDG 4</span>
                              </button>
-                             <button type="button" class="nav-btn-base nav-btn-next" data-next="sdg-6">
+                             <button type="button" class="nav-btn-base nav-btn-next next-btn" data-next="sdg-6">
                                  <span data-translate-key="continue_button">Continue to SDG 6</span>
                                  <i class="fas fa-arrow-right"></i>
                              </button>
@@ -466,11 +465,11 @@
                      <!-- Navigation -->
                      <div class="form-navigation-wrapper">
                          <div class="form-navigation">
-                             <button type="button" class="nav-btn-base nav-btn-prev" data-prev="sdg-5">
+                             <button type="button" class="nav-btn-base nav-btn-prev prev-btn" data-prev="sdg-5">
                                  <i class="fas fa-arrow-left"></i>
                                  <span data-translate-key="back_button">Back to SDG 5</span>
                              </button>
-                             <button type="button" class="nav-btn-base nav-btn-next" data-next="sdg-7">
+                             <button type="button" class="nav-btn-base nav-btn-next next-btn" data-next="sdg-7">
                                  <span data-translate-key="continue_button">Continue to SDG 7</span>
                                  <i class="fas fa-arrow-right"></i>
                              </button>
@@ -517,11 +516,11 @@
                      <!-- Navigation -->
                      <div class="form-navigation-wrapper">
                          <div class="form-navigation">
-                             <button type="button" class="nav-btn-base nav-btn-prev" data-prev="sdg-6">
+                             <button type="button" class="nav-btn-base nav-btn-prev prev-btn" data-prev="sdg-6">
                                  <i class="fas fa-arrow-left"></i>
                                  <span data-translate-key="back_button">Back to SDG 6</span>
                              </button>
-                             <button type="button" class="nav-btn-base nav-btn-next" data-next="sdg-8">
+                             <button type="button" class="nav-btn-base nav-btn-next next-btn" data-next="sdg-8">
                                  <span data-translate-key="continue_button">Continue to SDG 8</span>
                                  <i class="fas fa-arrow-right"></i>
                              </button>
@@ -594,11 +593,11 @@
                      <!-- Navigation -->
                      <div class="form-navigation-wrapper">
                          <div class="form-navigation">
-                             <button type="button" class="nav-btn-base nav-btn-prev" data-prev="sdg-7">
+                             <button type="button" class="nav-btn-base nav-btn-prev prev-btn" data-prev="sdg-7">
                                  <i class="fas fa-arrow-left"></i>
                                  <span data-translate-key="back_button">Back to SDG 7</span>
                              </button>
-                             <button type="button" class="nav-btn-base nav-btn-next" data-next="sdg-9">
+                             <button type="button" class="nav-btn-base nav-btn-next next-btn" data-next="sdg-9">
                                  <span data-translate-key="continue_button">Continue to SDG 9</span>
                                  <i class="fas fa-arrow-right"></i>
                              </button>
@@ -653,11 +652,11 @@
                      <!-- Navigation -->
                      <div class="form-navigation-wrapper">
                          <div class="form-navigation">
-                             <button type="button" class="nav-btn-base nav-btn-prev" data-prev="sdg-8">
+                             <button type="button" class="nav-btn-base nav-btn-prev prev-btn" data-prev="sdg-8">
                                  <i class="fas fa-arrow-left"></i>
                                  <span data-translate-key="back_button">Back to SDG 8</span>
                              </button>
-                             <button type="button" class="nav-btn-base nav-btn-next" data-next="sdg-10">
+                             <button type="button" class="nav-btn-base nav-btn-next next-btn" data-next="sdg-10">
                                  <span data-translate-key="continue_button">Continue to SDG 10</span>
                                  <i class="fas fa-arrow-right"></i>
                              </button>
@@ -710,11 +709,11 @@
                     <!-- Navigation -->
                     <div class="form-navigation-wrapper">
                         <div class="form-navigation">
-                            <button type="button" class="nav-btn-base nav-btn-prev" data-prev="sdg-9">
+                            <button type="button" class="nav-btn-base nav-btn-prev prev-btn" data-prev="sdg-9">
                                 <i class="fas fa-arrow-left"></i>
                                 <span data-translate-key="back_button">Back to SDG 9</span>
                             </button>
-                            <button type="button" class="nav-btn-base nav-btn-next" data-next="sdg-11">
+                            <button type="button" class="nav-btn-base nav-btn-next next-btn" data-next="sdg-11">
                                 <span data-translate-key="continue_button">Continue to SDG 11</span>
                                 <i class="fas fa-arrow-right"></i>
                             </button>
@@ -778,11 +777,11 @@
                     <!-- Navigation -->
                     <div class="form-navigation-wrapper">
                         <div class="form-navigation">
-                            <button type="button" class="nav-btn-base nav-btn-prev" data-prev="sdg-10">
+                            <button type="button" class="nav-btn-base nav-btn-prev prev-btn" data-prev="sdg-10">
                                 <i class="fas fa-arrow-left"></i>
                                 <span data-translate-key="back_button">Back to SDG 10</span>
                             </button>
-                            <button type="button" class="nav-btn-base nav-btn-next" data-next="sdg-12">
+                            <button type="button" class="nav-btn-base nav-btn-next next-btn" data-next="sdg-12">
                                 <span data-translate-key="continue_button">Continue to SDG 12</span>
                                 <i class="fas fa-arrow-right"></i>
                             </button>
@@ -849,11 +848,11 @@
                     <!-- Navigation -->
                     <div class="form-navigation-wrapper">
                         <div class="form-navigation">
-                            <button type="button" class="nav-btn-base nav-btn-prev" data-prev="sdg-11">
+                            <button type="button" class="nav-btn-base nav-btn-prev prev-btn" data-prev="sdg-11">
                                 <i class="fas fa-arrow-left"></i>
                                 <span data-translate-key="back_button">Back to SDG 11</span>
                             </button>
-                            <button type="button" class="nav-btn-base nav-btn-next" data-next="sdg-13">
+                            <button type="button" class="nav-btn-base nav-btn-next next-btn" data-next="sdg-13">
                                 <span data-translate-key="continue_button">Continue to SDG 13</span>
                                 <i class="fas fa-arrow-right"></i>
                             </button>
@@ -941,11 +940,11 @@
                       <!-- Navigation -->
                       <div class="form-navigation-wrapper">
                           <div class="form-navigation">
-                              <button type="button" class="nav-btn-base nav-btn-prev" data-prev="sdg-12">
+                              <button type="button" class="nav-btn-base nav-btn-prev prev-btn" data-prev="sdg-12">
                                   <i class="fas fa-arrow-left"></i>
                                   <span data-translate-key="back_button">Back to SDG 12</span>
                               </button>
-                              <button type="button" class="nav-btn-base nav-btn-next" data-next="sdg-14">
+                              <button type="button" class="nav-btn-base nav-btn-next next-btn" data-next="sdg-14">
                                   <span data-translate-key="continue_button">Continue to SDG 14</span>
                                   <i class="fas fa-arrow-right"></i>
                               </button>
@@ -1003,11 +1002,11 @@
                      <!-- Navigation -->
                      <div class="form-navigation-wrapper">
                         <div class="form-navigation">
-                            <button type="button" class="nav-btn-base nav-btn-prev" data-prev="sdg-13">
+                            <button type="button" class="nav-btn-base nav-btn-prev prev-btn" data-prev="sdg-13">
                                 <i class="fas fa-arrow-left"></i>
                                 <span data-translate-key="back_button">Back to SDG 13</span>
                             </button>
-                            <button type="button" class="nav-btn-base nav-btn-next" data-next="sdg-15">
+                            <button type="button" class="nav-btn-base nav-btn-next next-btn" data-next="sdg-15">
                                 <span data-translate-key="continue_button">Continue to SDG 15</span>
                                 <i class="fas fa-arrow-right"></i>
                             </button>
@@ -1094,11 +1093,11 @@
                      <!-- Navigation -->
                      <div class="form-navigation-wrapper">
                         <div class="form-navigation">
-                            <button type="button" class="nav-btn-base nav-btn-prev" data-prev="sdg-14">
+                            <button type="button" class="nav-btn-base nav-btn-prev prev-btn" data-prev="sdg-14">
                                 <i class="fas fa-arrow-left"></i>
                                 <span data-translate-key="back_button">Back to SDG 14</span>
                             </button>
-                            <button type="button" class="nav-btn-base nav-btn-next" data-next="sdg-16">
+                            <button type="button" class="nav-btn-base nav-btn-next next-btn" data-next="sdg-16">
                                 <span data-translate-key="continue_button">Continue to SDG 16</span>
                                 <i class="fas fa-arrow-right"></i>
                             </button>
@@ -1161,11 +1160,11 @@
                      <!-- Navigation -->
                      <div class="form-navigation-wrapper">
                         <div class="form-navigation">
-                            <button type="button" class="nav-btn-base nav-btn-prev" data-prev="sdg-15">
+                            <button type="button" class="nav-btn-base nav-btn-prev prev-btn" data-prev="sdg-15">
                                 <i class="fas fa-arrow-left"></i>
                                 <span data-translate-key="back_button">Back to SDG 15</span>
                             </button>
-                            <button type="button" class="nav-btn-base nav-btn-next" data-next="sdg-17">
+                            <button type="button" class="nav-btn-base nav-btn-next next-btn" data-next="sdg-17">
                                 <span data-translate-key="continue_button">Continue to SDG 17</span>
                                 <i class="fas fa-arrow-right"></i>
                             </button>
@@ -1232,7 +1231,7 @@
                     <!-- Navigation & Submit -->
                     <div class="form-navigation-wrapper">
                         <div class="form-navigation">
-                            <button type="button" class="nav-btn-base nav-btn-prev" data-prev="sdg-16">
+                            <button type="button" class="nav-btn-base nav-btn-prev prev-btn" data-prev="sdg-16">
                                 <i class="fas fa-arrow-left"></i>
                                 <span data-translate-key="back_button">Back to SDG 16</span>
                             </button>
@@ -1252,22 +1251,12 @@
              <!-- Results content will be displayed on a separate page -->
         </section>
 
-    </main>
-
-    <footer class="bg-slate-800 text-slate-300 p-4 text-center w-full text-xs mt-12 no-print">
-        <span data-translate-key="footer_text">SDG Tool Kit</span> © <span id="current-year">{{ now.year }}</span> | UIA
-    </footer>
-
-    <!-- Include Split JavaScript Files -->
+</div><!-- end container-lg -->
+{% endblock %}
+{% block scripts %}
+{{ super() }}
     <script src="{{ url_for('static', filename='js/assessment/i18n_assessment.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/assessment/scoring_assessment.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/assessment/main_assessment.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/assessment/ui_assessment.js') }}" defer></script>
-    {# charting_assessment.js not needed here #}
-
-    <script>
-        // Update current year in footer
-        document.getElementById('current-year').textContent = new Date().getFullYear();
-    </script>
-</body>
-</html>
+{% endblock %}

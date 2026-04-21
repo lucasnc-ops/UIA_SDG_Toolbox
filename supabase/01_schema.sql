@@ -178,6 +178,19 @@ ALTER TABLE assessments
 CREATE UNIQUE INDEX IF NOT EXISTS ix_assessments_share_token ON assessments (share_token);
 
 -- ---------------------------------------------------------------------------
+-- UIA Import Extension — Add project metadata columns for Excel import
+-- ---------------------------------------------------------------------------
+
+ALTER TABLE projects
+    ADD COLUMN IF NOT EXISTS external_code VARCHAR(16),
+    ADD COLUMN IF NOT EXISTS authors       TEXT,
+    ADD COLUMN IF NOT EXISTS organization  VARCHAR(255),
+    ADD COLUMN IF NOT EXISTS uia_region    VARCHAR(64),
+    ADD COLUMN IF NOT EXISTS selected      BOOLEAN DEFAULT false;
+
+CREATE INDEX IF NOT EXISTS ix_projects_external_code ON projects (external_code);
+
+-- ---------------------------------------------------------------------------
 -- Set alembic version to current head so flask db upgrade is a no-op
 -- ---------------------------------------------------------------------------
 
