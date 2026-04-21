@@ -399,9 +399,10 @@
 <nav aria-label="breadcrumb" class="py-3">
     <ol class="breadcrumb mb-0">
         <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
-        <li class="breadcrumb-item"><a href="#">Commissions</a></li>
-        <li class="breadcrumb-item"><a href="#">UN 17 SDGs</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Assessment</li>
+        <li class="breadcrumb-item"><a href="{{ url_for('projects.index') }}">My Projects</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('projects.show', id=project.id) }}">{{ project.name }}</a></li>
+        <li class="breadcrumb-item">Standard Assessment</li>
+        <li class="breadcrumb-item active" aria-current="page">Assessment #{{ assessment.id }}</li>
     </ol>
 </nav>
 {% endblock %}
@@ -415,6 +416,7 @@
             <p class="lh-sm mb-4" style="max-width: 800px; font-size: 1.1rem;">
                 Evaluate your architectural project against the UN Sustainable Development Goals.
             </p>
+            {% include "partials/_lang_switcher.html" %}
         </div>
     </div>
 </div>
@@ -1680,6 +1682,7 @@
 {% endblock %}
 {% block scripts %}
 {{ super() }}
+    <script src="{{ url_for('static', filename='js/assessment/i18n_assessment.js') }}" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             console.log("DOM fully loaded and parsed.");
