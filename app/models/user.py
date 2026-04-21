@@ -12,6 +12,7 @@ class User(db.Model, UserMixin):
     name = db.Column(db.String(128))
     email = db.Column(db.String(128), unique=True, nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
+    email_confirmed = db.Column(db.Boolean, default=False)
     password_hash = db.Column(db.String(128))
 
     # UIA integration fields (nullable — filled when UIA SSO is connected)

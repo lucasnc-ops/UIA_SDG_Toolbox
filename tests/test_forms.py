@@ -85,7 +85,7 @@ def test_project_form_description_length(app):
 
 def test_project_form_size_validation(app):
     """Test size field validation in ProjectForm."""
-    
+
     # Test valid size
     with app.test_request_context('/fake', method='POST', data={
         'name': 'Test Project',
@@ -97,7 +97,7 @@ def test_project_form_size_validation(app):
         form = ProjectForm()
         assert form.validate() is True
         assert 'size_sqm' not in form.errors
-    
+
     # Test non-numeric value
     with app.test_request_context('/fake', method='POST', data={
         'name': 'Test Project',
@@ -110,7 +110,7 @@ def test_project_form_size_validation(app):
         assert form.validate() is False
         assert 'size_sqm' in form.errors
         assert 'Not a valid float value' in form.errors['size_sqm'][0]
-    
+
     # Test negative value
     with app.test_request_context('/fake', method='POST', data={
         'name': 'Test Project',
@@ -122,8 +122,8 @@ def test_project_form_size_validation(app):
         form = ProjectForm()
         assert form.validate() is False
         assert 'size_sqm' in form.errors
-        assert 'Size must be a positive number less than 1,000,000 sq meters' in form.errors['size_sqm']
-    
+        assert 'Size must be a positive number' in str(form.errors['size_sqm'])
+
     # Test zero value
     with app.test_request_context('/fake', method='POST', data={
         'name': 'Test Project',
@@ -135,8 +135,8 @@ def test_project_form_size_validation(app):
         form = ProjectForm()
         assert form.validate() is False
         assert 'size_sqm' in form.errors
-        assert 'Size must be a positive number less than 1,000,000 sq meters' in form.errors['size_sqm']
-    
+        assert 'Size must be a positive number' in str(form.errors['size_sqm'])
+
     # Test value exceeding maximum
     with app.test_request_context('/fake', method='POST', data={
         'name': 'Test Project',
@@ -148,9 +148,9 @@ def test_project_form_size_validation(app):
         form = ProjectForm()
         assert form.validate() is False
         assert 'size_sqm' in form.errors
-        assert 'Size must be a positive number less than 1,000,000 sq meters' in form.errors['size_sqm']
-    
-    # Test empty value (should be valid since field is optional)
+        assert 'Size must be less than 1,000,000 sq meters' in str(form.errors['size_sqm'])
+
+    # Test empty value (size_sqm is now required)
     with app.test_request_context('/fake', method='POST', data={
         'name': 'Test Project',
         'description': 'A test project description',
@@ -159,8 +159,9 @@ def test_project_form_size_validation(app):
         'size_sqm': ''
     }):
         form = ProjectForm()
-        assert form.validate() is True
-        assert 'size_sqm' not in form.errors
+        assert form.validate() is False
+        assert 'size_sqm' in form.errors
+        assert 'Size is required' in str(form.errors['size_sqm'])
 
 def test_project_form_project_type_validation(app):
     """Test project form validation for project type field."""
@@ -241,6 +242,8 @@ def test_project_form_empty_values(app):
         assert 'Project name is required' in form.errors['name']
         assert 'project_type' in form.errors
         assert 'Project type is required' in form.errors['project_type']
+        assert 'size_sqm' in form.errors
+        assert 'Size is required' in str(form.errors['size_sqm'])
 
 # Test for DateAfterValidator
 def test_date_after_validator():
@@ -282,63 +285,64 @@ def test_date_after_validator():
     assert form.validate() is False
     assert "Custom message" in form.end_date.errors
     
-    # Test with missing referenced field
+    # Test with missing referenced field — validator flags it as an error
     class TestFormBadField(Form):
         end_date = DateField('End Date', validators=[DateAfterValidator('non_existent_field')])
-    
+
     form = TestFormBadField()
     form.end_date.data = datetime.now().date()
-    with pytest.raises(ValidationError):
-        form.validate()
+    result = form.validate()
+    assert result is False
+    assert "non_existent_field" in form.end_date.errors[0]
 
 # Test ProjectForm validation
-def test_project_form_validation():
+def test_project_form_validation(app):
     """Test that ProjectForm validates data correctly."""
-    # Test with valid data
-    form = ProjectForm(
-        name="Test Project",
-        description="Description",
-        project_type="residential",
-        location="Test location",
-        size_sqm=1000,
-        start_date=datetime.now().date(),
-        end_date=(datetime.now() + timedelta(days=30)).date(),
-        budget=50000,
-        sector="technology"
-    )
-    assert form.validate() is True
-    
-    # Test with invalid data - name too long
-    form = ProjectForm(
-        name="T" * 101,  # Exceeds 100 char limit
-        description="Description",
-        project_type="residential",
-        location="Test location",
-        size_sqm=1000
-    )
-    assert form.validate() is False
-    assert "Project name must be less than 100 characters" in form.name.errors
-    
-    # Test with invalid data - negative size
-    form = ProjectForm(
-        name="Test Project",
-        description="Description",
-        project_type="residential",
-        location="Test location",
-        size_sqm=-1  # Negative size
-    )
-    assert form.validate() is False
-    assert "Size must be a positive number less than 1,000,000 sq meters" in form.size_sqm.errors
-    
-    # Test with invalid data - end date before start date
-    form = ProjectForm(
-        name="Test Project",
-        description="Description",
-        project_type="residential",
-        location="Test location",
-        size_sqm=1000,
-        start_date=datetime.now().date(),
-        end_date=(datetime.now() - timedelta(days=30)).date()  # End date before start date
-    )
-    assert form.validate() is False
-    assert "End date must be after start date" in form.end_date.errors 
+    with app.test_request_context('/fake', method='POST', data={
+        'name': 'Test Project',
+        'description': 'Description',
+        'project_type': 'residential',
+        'location': 'Test location',
+        'size_sqm': '1000',
+        'start_date': '2023-01-01',
+        'end_date': '2023-12-31',
+        'budget': '50000',
+        'sector': 'technology',
+    }):
+        form = ProjectForm()
+        assert form.validate() is True
+
+    # Name too long
+    with app.test_request_context('/fake', method='POST', data={
+        'name': 'T' * 101,
+        'project_type': 'residential',
+        'location': 'Test location',
+        'size_sqm': '1000',
+    }):
+        form = ProjectForm()
+        assert form.validate() is False
+        assert 'Project name must be less than 100 characters' in form.name.errors
+
+    # Negative size
+    with app.test_request_context('/fake', method='POST', data={
+        'name': 'Test Project',
+        'project_type': 'residential',
+        'location': 'Test location',
+        'size_sqm': '-1',
+    }):
+        form = ProjectForm()
+        assert form.validate() is False
+        assert 'Size must be a positive number' in str(form.size_sqm.errors)
+
+    # End date before start date
+    with app.test_request_context('/fake', method='POST', data={
+        'name': 'Test Project',
+        'project_type': 'residential',
+        'location': 'Test location',
+        'size_sqm': '1000',
+        'start_date': '2023-06-01',
+        'end_date': '2023-01-01',
+    }):
+        form = ProjectForm()
+        assert form.validate() is False
+        assert 'End date must be after start date' in form.end_date.errors 

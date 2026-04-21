@@ -236,6 +236,7 @@ def create_app(config_name=None):
     app.register_blueprint(assessments_bp, url_prefix='/assessments')
     app.register_blueprint(questionnaire_bp, url_prefix='/questionnaire')
     app.register_blueprint(api_bp, url_prefix='/api')
+    app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
 
     # Register error handlers
     from app.utils.errors import register_error_handlers

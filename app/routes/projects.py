@@ -104,7 +104,13 @@ def show(id):
         abort(403)  # Forbidden
     
     # Get assessments for this project
+    from app.models.assessment import Assessment
     assessments = Assessment.query.filter_by(project_id=project.id).order_by(Assessment.id.desc()).all()
+    
+    # Debug log to verify what is being fetched
+    print(f"DEBUG: Found {len(assessments)} assessments for project {id}")
+    for a in assessments:
+        print(f"DEBUG: ID {a.id}, Type: {a.assessment_type}, Status: {a.status}")
     
     return render_template('projects/show.html', project=project, assessments=assessments)
 
@@ -182,25 +188,9 @@ def update_status(id):
     
     project.status = status
     db.session.commit()
-    flash(f'Project status updated to {status}', 'success')
+    flash(f'Project status updated to {status.replace("_", " ")}', 'success')
     return redirect(url_for('projects.show', id=id))
 
-@projects_bp.route('/search')
-@login_required
-def search():
-    """Search projects."""
-    query = request.args.get('q', '')
-    project_type = request.args.get('type')
-    
-    search_query = Project.query.filter_by(user_id=current_user.id)
-    
-    if query:
-        search_query = search_query.filter(Project.name.ilike(f'%{query}%'))
-    if project_type:
-        search_query = search_query.filter_by(project_type=project_type)
-    
-    projects = search_query.all()
-    return render_template('projects/search.html', projects=projects, query=query)
 
 @projects_bp.route('/<int:id>/export')
 @login_required

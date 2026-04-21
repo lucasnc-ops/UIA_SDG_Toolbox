@@ -3,6 +3,60 @@
 
 // Note: DOM element references are defined in main_assessment.js after DOMContentLoaded
 
+/**
+ * Updates all elements in the DOM that have a data-translate-key attribute
+ * using the currently selected language in the translations object.
+ */
+function updateUIForLanguage() {
+    if (typeof translations === 'undefined' || !translations[currentLanguage]) {
+        console.warn(`[i18n] Translations not loaded or language ${currentLanguage} not found`);
+        return;
+    }
+
+    const langData = translations[currentLanguage];
+    console.log(`[i18n] Updating UI for language: ${currentLanguage}`);
+
+    // Update all elements with data-translate-key
+    document.querySelectorAll('[data-translate-key]').forEach(el => {
+        const key = el.getAttribute('data-translate-key');
+        let translatedText = langData[key];
+
+        // Fallback to English if key is missing in current language
+        if (!translatedText && currentLanguage !== 'en') {
+            translatedText = translations['en'][key];
+        }
+
+        if (translatedText) {
+            // Special handling for different element types
+            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                if (el.placeholder !== undefined && el.hasAttribute('placeholder')) {
+                    el.placeholder = translatedText;
+                } else {
+                    el.value = translatedText;
+                }
+            } else if (el.tagName === 'OPTGROUP' || el.tagName === 'OPTION') {
+                el.label = translatedText;
+                if (el.tagName === 'OPTION') el.textContent = translatedText;
+            } else {
+                // For standard elements (p, h2, span, etc.)
+                // We use innerHTML to support potentially formatted text from the translations
+                el.innerHTML = translatedText;
+            }
+        }
+    });
+
+    // Update dynamic navigation buttons that might have numbers in them
+    updateNavigationButtonText();
+    
+    // Update progress text
+    if (typeof updateProgress === 'function') updateProgress();
+
+    // Update SDG Indicator buttons titles
+    if (typeof updateIndicatorButtons === 'function') updateIndicatorButtons();
+    
+    console.log(`[i18n] UI update complete for ${currentLanguage}`);
+}
+
 function generateIndicatorButtons() {
     if (!indicatorContainer) return;
     indicatorContainer.innerHTML = ''; // Clear existing
@@ -120,27 +174,42 @@ function showSection(sectionId) {
 
 
 function updateProgress() {
-    if (!progressBar || !progressText) return;
-    const currentSdgNumber = parseInt(currentSectionId.split('-')[1] || '1');
-    const progressPercentage = (currentSdgNumber / TOTAL_SDGS) * 100;
+    // Safety check: only update if the elements exist (Standard page uses different IDs)
+    if (typeof progressBar === 'undefined' || !progressBar || typeof progressText === 'undefined' || !progressText) {
+        // Log quietly so it doesn't clutter console if it's expected
+        return;
+    }
+    
+    // Ensure currentSectionId is defined
+    const sectionId = (typeof currentSectionId !== 'undefined') ? currentSectionId : 'sdg-1';
+    
+    // Expert Assessment uses sdg-X IDs, Standard might use different logic
+    const sectionMatch = sectionId.match(/sdg-(\d+)/);
+    const currentSdgNumber = sectionMatch ? parseInt(sectionMatch[1]) : (parseInt(sectionId) || 1);
+    
+    // Check if TOTAL_SDGS exists (from main_assessment.js)
+    const total = (typeof TOTAL_SDGS !== 'undefined') ? TOTAL_SDGS : 7; // Fallback to 7 for Standard
+    const progressPercentage = (currentSdgNumber / total) * 100;
 
     progressBar.style.width = `${progressPercentage}%`;
     // Update progress text using translation key
     progressText.textContent = (typeof translations !== 'undefined' && translations[currentLanguage])
                                 ? (translations[currentLanguage]['progress_status'] || 'SDG {current} of {total}')
                                     .replace('{current}', currentSdgNumber)
-                                    .replace('{total}', TOTAL_SDGS)
-                                : `SDG ${currentSdgNumber} of ${TOTAL_SDGS}`; // Fallback
+                                    .replace('{total}', total)
+                                : `SDG ${currentSdgNumber} of ${total}`; // Fallback
 }
 
 function updateIndicatorButtons() {
-     if (!indicatorContainer) return;
+     if (typeof indicatorContainer === 'undefined' || !indicatorContainer) return;
     const buttons = indicatorContainer.querySelectorAll('.sdg-indicator-btn');
     buttons.forEach(btn => {
         const sdgId = btn.dataset.sdg;
         btn.classList.remove('active', 'visited');
         const sdgNum = parseInt(sdgId.split('-')[1]);
-        const info = SDG_INFO[sdgNum] || {};
+        
+        // Ensure SDG_INFO exists
+        const info = (typeof SDG_INFO !== 'undefined' && SDG_INFO[sdgNum]) ? SDG_INFO[sdgNum] : {};
         const baseColor = info.color || '#9CA3AF';
         const lightBg = baseColor + '33';
         const darkText = baseColor;

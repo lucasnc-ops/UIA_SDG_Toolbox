@@ -6,7 +6,8 @@ Tests: Submit responses → Calculate scores → Verify SDG breakdown
 import pytest
 from app.models.assessment import Assessment, SdgScore
 from app.models.response import QuestionResponse
-from app.models.sdg import SdgQuestion, SdgGoal, SdgRelationship
+from app.models.sdg import SdgQuestion, SdgGoal
+from app.models.sdg_relationship import SdgRelationship
 from app.services.scoring_service import calculate_sdg_scores
 from datetime import datetime
 
