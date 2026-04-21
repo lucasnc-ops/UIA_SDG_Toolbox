@@ -6,6 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{% block title %}SDG Assessment Tool{% endblock %}</title>
     
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/UIA_LOGO.png') }}">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -451,21 +453,11 @@
     {% block head %}{% endblock %} {# For page-specific CSS files or styles #}
 </head>
 <body>
-    <!-- Collapsible Search -->
-    <div class="collapse py-4 border-bottom border-dark" id="collapseSearch">
-        <div class="container-lg">
-            <input type="search" class="form-control form-control-lg border-0 border-bottom rounded-0"
-                   placeholder="Search…" autofocus>
-        </div>
-    </div>
-
     <!-- Header Top (Search / account links) -->
     <div class="container-lg">
         <div class="row">
             <div class="col-lg-10 offset-lg-2">
                 <div class="header-top text-end mt-3 mb-1">
-                    <a href="#" data-bs-toggle="collapse" data-bs-target="#collapseSearch"
-                       aria-expanded="false" aria-controls="collapseSearch">Search</a>
                     {% if current_user.is_authenticated %}
                         <a href="{{ url_for('auth.profile') }}">{{ current_user.name|truncate(20) }}</a>
                         <a href="{{ url_for('auth.logout') }}">Logout</a>
