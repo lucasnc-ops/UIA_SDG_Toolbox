@@ -821,13 +821,21 @@ async function generatePDF() {
         await new Promise(resolve => setTimeout(resolve, 500));  // Increased from 200ms
 
         // Force chart redraw to ensure canvas is populated
-        if (window.SDGCharts && window.SDGCharts.charts) {
-            Object.values(window.SDGCharts.charts).forEach(chart => {
-                if (chart && chart.update) {
-                    chart.update('none');  // Update without animation
-                }
-            });
-        }
+        const chartsToUpdate = [
+            window.radarChart,
+            window.barChart,
+            window.categoriesPolarChart,
+            window.dimensionsChart,
+            window.strengthsGapsChart,
+            window.comparisonChart,
+            window.categoryBarChartInstance
+        ];
+
+        chartsToUpdate.forEach(chart => {
+            if (chart && typeof chart.update === 'function') {
+                chart.update('none');  // Update without animation
+            }
+        });
 
         // Wait for chart updates
         await new Promise(resolve => setTimeout(resolve, 300));

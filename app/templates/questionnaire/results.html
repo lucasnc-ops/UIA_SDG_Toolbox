@@ -523,6 +523,7 @@
         window.sdgScoresData = {{ sdg_scores | tojson | safe }};
         window.projectName = {{ project.name | default('Project') | tojson }}; // Use tojson for safe JS embedding
         window.assessmentId = "{{ assessment.id | default('') }}";
+        window.projectId = "{{ project.id }}";
 
         // Prepare SDG name lookup object (can also be done in results_page.js if preferred)
         window.sdgNameLookup = {};
