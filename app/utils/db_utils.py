@@ -10,21 +10,23 @@ from sqlalchemy import text
 logger = logging.getLogger(__name__)
 
 SDG_GOAL_DATA = [
-    {
-        'number': 1,
-        'name': 'No Poverty',
-        'color_code': '#E5243B',
-        'description': 'End poverty in all its forms everywhere'
-    },
-    {
-        'number': 2,
-        'name': 'Zero Hunger',
-        'color_code': '#DDA63A',
-        'description': 'End hunger, achieve food security and improved nutrition and promote sustainable agriculture'
-    }
-    # Add more goals as needed for other tests or application functionality
-    # {'number': 3, 'name': 'Good Health and Well-being', ...},
-    # ... up to 17
+    {'number': 1,  'name': 'No Poverty',                          'color_code': '#E5243B', 'description': 'End poverty in all its forms everywhere'},
+    {'number': 2,  'name': 'Zero Hunger',                         'color_code': '#DDA63A', 'description': 'End hunger, achieve food security and improved nutrition and promote sustainable agriculture'},
+    {'number': 3,  'name': 'Good Health and Well-being',          'color_code': '#4C9F38', 'description': 'Ensure healthy lives and promote well-being for all at all ages'},
+    {'number': 4,  'name': 'Quality Education',                   'color_code': '#C5192D', 'description': 'Ensure inclusive and equitable quality education and promote lifelong learning opportunities for all'},
+    {'number': 5,  'name': 'Gender Equality',                     'color_code': '#FF3A21', 'description': 'Achieve gender equality and empower all women and girls'},
+    {'number': 6,  'name': 'Clean Water and Sanitation',          'color_code': '#26BDE2', 'description': 'Ensure availability and sustainable management of water and sanitation for all'},
+    {'number': 7,  'name': 'Affordable and Clean Energy',         'color_code': '#FCC30B', 'description': 'Ensure access to affordable, reliable, sustainable and modern energy for all'},
+    {'number': 8,  'name': 'Decent Work and Economic Growth',     'color_code': '#A21942', 'description': 'Promote sustained, inclusive and sustainable economic growth, full and productive employment and decent work for all'},
+    {'number': 9,  'name': 'Industry, Innovation and Infrastructure', 'color_code': '#FD6925', 'description': 'Build resilient infrastructure, promote inclusive and sustainable industrialization and foster innovation'},
+    {'number': 10, 'name': 'Reduced Inequalities',                'color_code': '#DD1367', 'description': 'Reduce inequality within and among countries'},
+    {'number': 11, 'name': 'Sustainable Cities and Communities',  'color_code': '#FD9D24', 'description': 'Make cities and human settlements inclusive, safe, resilient and sustainable'},
+    {'number': 12, 'name': 'Responsible Consumption and Production', 'color_code': '#BF8B2E', 'description': 'Ensure sustainable consumption and production patterns'},
+    {'number': 13, 'name': 'Climate Action',                      'color_code': '#3F7E44', 'description': 'Take urgent action to combat climate change and its impacts'},
+    {'number': 14, 'name': 'Life Below Water',                    'color_code': '#0A97D9', 'description': 'Conserve and sustainably use the oceans, seas and marine resources for sustainable development'},
+    {'number': 15, 'name': 'Life on Land',                        'color_code': '#56C02B', 'description': 'Protect, restore and promote sustainable use of terrestrial ecosystems'},
+    {'number': 16, 'name': 'Peace, Justice and Strong Institutions', 'color_code': '#00689D', 'description': 'Promote peaceful and inclusive societies for sustainable development'},
+    {'number': 17, 'name': 'Partnerships for the Goals',          'color_code': '#19486A', 'description': 'Strengthen the means of implementation and revitalize the global partnership for sustainable development'},
 ]
 
 SDG_QUESTION_DATA = [
