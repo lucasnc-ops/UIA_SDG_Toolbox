@@ -62,28 +62,29 @@
                  </div>
             </div>
             <div class="flex space-x-3 text-sm">
-                <button type="button" class="lang-btn px-2 py-1 transition duration-150 ease-in-out hover:bg-white/20 active:bg-white/30" onclick="setLanguage('en')" data-lang="en">English</button>
-                <button type="button" class="lang-btn px-2 py-1 transition duration-150 ease-in-out hover:bg-white/20 active:bg-white/30" onclick="setLanguage('fr')" data-lang="fr">Français</button>
+                <button type="button" class="lang-btn px-2 py-1 transition duration-150 ease-in-out hover:bg-white/20 active:bg-white/30 font-semibold text-xs" onclick="setLanguage('en')" data-lang="en">EN</button>
+                <button type="button" class="lang-btn px-2 py-1 transition duration-150 ease-in-out hover:bg-white/20 active:bg-white/30 font-semibold text-xs" onclick="setLanguage('pt-br')" data-lang="pt-br">PT</button>
+                <button type="button" class="lang-btn px-2 py-1 transition duration-150 ease-in-out hover:bg-white/20 active:bg-white/30 font-semibold text-xs" onclick="setLanguage('fr')" data-lang="fr">FR</button>
             </div>
         </div>
     </header>
 
     <main class="container mx-auto p-4 md:p-6 lg:p-8 mt-8"> {# Added margin-top #}
 
-        <h2 class="text-3xl font-bold mb-2 text-gray-800">Expert Assessment Report</h2>
-        <p class="text-gray-600 mb-8">Project: <span class="font-semibold">{{ project.name }}</span> | Assessed on: {{ assessment.completed_at|format_date if assessment.completed_at else 'N/A' }}</p>
+        <h2 class="text-3xl font-bold mb-2 text-gray-800" data-translate-key="expert_results_heading">Expert Assessment Report</h2>
+        <p class="text-gray-600 mb-8"><span data-translate-key="expert_results_project_label">Project:</span> <span class="font-semibold">{{ project.name }}</span> | <span data-translate-key="expert_results_assessed_on">Assessed on:</span> {{ assessment.completed_at|format_date if assessment.completed_at else 'N/A' }}</p>
 
         {# --- Charts Section --- #}
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-100 chart-wrapper">
-                <h3 class="text-xl font-semibold mb-4 text-gray-700 text-center" data-translate-key="results_radar_title">SDG Performance Overview</h3>
+                <h3 class="text-xl font-semibold mb-4 text-gray-700 text-center" data-translate-key="expert_results_overview_title">SDG Performance Overview</h3>
                 {# Added container div for potential print sizing #}
                 <div class="h-80 md:h-96 print-chart-container">
                     <canvas id="radar-chart"></canvas> {# Ensure this ID matches JS #}
                 </div>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-lg border border-gray-100 chart-wrapper">
-                <h3 class="text-xl font-semibold mb-4 text-gray-700 text-center" data-translate-key="results_bar_title">Scores per SDG</h3>
+                <h3 class="text-xl font-semibold mb-4 text-gray-700 text-center" data-translate-key="expert_results_scores_title">Scores per SDG</h3>
                  <div class="h-80 md:h-96 print-chart-container">
                     <canvas id="bar-chart"></canvas> {# Ensure this ID matches JS #}
                  </div>
@@ -92,7 +93,7 @@
 
         {# --- Detailed Breakdown Section --- #}
         <div class="bg-white p-6 rounded-lg shadow-lg mb-8 border border-gray-100">
-            <h3 class="text-xl font-semibold mb-6 text-gray-700" data-translate-key="results_detail_title">Detailed Performance by SDG</h3>
+            <h3 class="text-xl font-semibold mb-6 text-gray-700" data-translate-key="expert_results_breakdown_title">Detailed Performance by SDG</h3>
             {# Target div for JS population #}
             <div id="sdg-breakdown-details" class="space-y-4">
                  <div class="p-4 bg-slate-50 rounded text-center text-gray-500 italic">
@@ -104,10 +105,10 @@
         {# --- Action Buttons --- #}
         <div class="flex flex-wrap justify-center items-center gap-4 mt-10 no-print">
              <button id="print-results" type="button" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-5 rounded-md shadow transition duration-150 ease-in-out inline-flex items-center">
-                 <i class="fas fa-print mr-2"></i> <span data-translate-key="print_button">Print Results</span>
+                 <i class="fas fa-print mr-2"></i> <span data-translate-key="expert_results_print_btn">Print Results</span>
              </button>
              <button id="download-results" type="button" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-5 rounded-md shadow transition duration-150 ease-in-out inline-flex items-center">
-                 <i class="fas fa-file-pdf mr-2"></i> <span data-translate-key="download_button">Download PDF</span>
+                 <i class="fas fa-file-pdf mr-2"></i> <span data-translate-key="expert_results_pdf_btn">Download PDF</span>
              </button>
              {# Link back to the specific project page #}
               <a href="{{ url_for('projects.show', id=project.id) }}" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-5 rounded-md shadow transition duration-150 ease-in-out inline-flex items-center">
@@ -115,7 +116,7 @@
               </a>
               {# Optional: Link to start a new Expert assessment for this project #}
               <a href="{{ url_for('projects.expert_assessment', project_id=project.id) }}" class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-5 rounded-md shadow transition duration-150 ease-in-out inline-flex items-center">
-                  <i class="fas fa-plus-circle mr-2"></i> <span data-translate-key="restart_button">Start New Expert</span>
+                  <i class="fas fa-plus-circle mr-2"></i> <span data-translate-key="expert_results_new_btn">Start New Expert Assessment</span>
               </a>
         </div>
 
@@ -159,48 +160,8 @@
         window.currentLanguage = '{{ request.accept_languages.best_match(["en", "pt-br", "pt", "fr"]) or "en" }}';
         if (window.currentLanguage === 'pt') window.currentLanguage = 'pt-br'; // Normalize
 
-        window.translations = {
-            en: { 
-                score_label: 'Score',
-                perf_excellent: 'Excellent',
-                perf_good: 'Good', 
-                perf_fair: 'Fair',
-                perf_needs_improvement: 'Needs Improvement',
-                pdf_alert: 'PDF Generation is not fully implemented. Printing the page might be a temporary alternative.'
-            },
-            fr: { 
-                score_label: 'Score',
-                perf_excellent: 'Excellent',
-                perf_good: 'Bon', 
-                perf_fair: 'Passable',
-                perf_needs_improvement: 'À améliorer',
-                pdf_alert: 'La génération PDF n\'est pas entièrement implémentée. Imprimer la page pourrait être une alternative temporaire.'
-            }
-        };
-        
-        // Add SDG title translations that the UI code expects
-        const sdgTitles = {
-            en: {},
-            fr: {}
-        };
-        
-        // Populate SDG title translations from SDG_INFO
-        Object.keys(SDG_INFO).forEach(sdgNum => {
-            const sdgInfo = SDG_INFO[sdgNum];
-            if (sdgInfo && sdgInfo.name) {
-                sdgTitles.en[`sdg${sdgNum}_title`] = sdgInfo.name;
-                sdgTitles.fr[`sdg${sdgNum}_title`] = sdgInfo.name; // Use English names for now
-            }
-        });
-        
-        // Merge SDG titles into translations
-        Object.assign(window.translations.en, sdgTitles.en);
-        Object.assign(window.translations.fr, sdgTitles.fr);
-        
         console.log("Embedded sdgScoresData:", window.sdgScoresData);
-        console.log("Embedded SDG_INFO:", window.SDG_INFO);  // Log to verify
-        console.log("Current language:", window.currentLanguage);
-        console.log("Translations:", window.translations);
+        console.log("Embedded SDG_INFO:", window.SDG_INFO);
     </script>
 
 </body>

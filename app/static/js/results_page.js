@@ -821,13 +821,21 @@ async function generatePDF() {
         await new Promise(resolve => setTimeout(resolve, 500));  // Increased from 200ms
 
         // Force chart redraw to ensure canvas is populated
-        if (window.SDGCharts && window.SDGCharts.charts) {
-            Object.values(window.SDGCharts.charts).forEach(chart => {
-                if (chart && chart.update) {
-                    chart.update('none');  // Update without animation
-                }
-            });
-        }
+        const chartsToUpdate = [
+            window.radarChart,
+            window.barChart,
+            window.categoriesPolarChart,
+            window.dimensionsChart,
+            window.strengthsGapsChart,
+            window.comparisonChart,
+            window.categoryBarChartInstance
+        ];
+
+        chartsToUpdate.forEach(chart => {
+            if (chart && typeof chart.update === 'function') {
+                chart.update('none');  // Update without animation
+            }
+        });
 
         // Wait for chart updates
         await new Promise(resolve => setTimeout(resolve, 300));
@@ -850,13 +858,11 @@ async function generatePDF() {
 
         console.log("Starting html2canvas...");
         const canvas = await html2canvas(elementToPrint, {
-            scale: 2,  // Higher quality
-            logging: true,  // Enable logging for debugging
+            scale: 1.5,  // Avoid hitting browser canvas size limits on long pages
             useCORS: true,
             allowTaint: false,
             backgroundColor: '#ffffff',
-            height: elementToPrint.scrollHeight,
-            windowHeight: elementToPrint.scrollHeight + 100,  // Extra buffer
+            scrollY: -window.scrollY, // Fix for scroll-related offsets causing blank/black spaces
             onclone: (clonedDoc) => {
                 // Ensure charts are visible in cloned document
                 const clonedCanvases = clonedDoc.querySelectorAll('canvas');
@@ -869,7 +875,9 @@ async function generatePDF() {
 
         console.log(`Canvas generated: ${canvas.width}x${canvas.height}`);
 
-        const imgData = canvas.toDataURL('image/png', 1.0);  // Maximum quality
+        // Use JPEG instead of PNG to significantly reduce memory/payload size
+        // and avoid "corrupted data" issues with massive base64 strings in jsPDF
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
         const { jsPDF } = jspdf;
         const pdf = new jsPDF({
             orientation: 'p',
@@ -882,32 +890,25 @@ async function generatePDF() {
         const pdfHeight = pdf.internal.pageSize.getHeight();
         const margin = 10;  // 10mm margins
         const contentWidth = pdfWidth - (margin * 2);
+        const contentHeight = pdfHeight - (margin * 2); // Height of printable area
 
         const imgProps = pdf.getImageProperties(imgData);
         const imgWidth = contentWidth;
         const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
 
-        let currentHeight = 0;
-        let page = 1;
+        let heightLeft = imgHeight;
+        let position = 0; // Cumulative vertical offset
 
-        // Multi-page handling with margins
-        while (currentHeight < imgHeight) {
-            if (page > 1) {
-                pdf.addPage();
-            }
+        // First page
+        pdf.addImage(imgData, 'JPEG', margin, margin, imgWidth, imgHeight);
+        heightLeft -= contentHeight;
 
-            // Add image with margins
-            pdf.addImage(
-                imgData,
-                'PNG',
-                margin,  // x position
-                margin - currentHeight,  // y position
-                imgWidth,
-                imgHeight
-            );
-
-            currentHeight += (pdfHeight - (margin * 2));
-            page++;
+        // Remaining pages
+        while (heightLeft > 0) {
+            pdf.addPage();
+            position -= contentHeight; // Shift image UP for the next slice
+            pdf.addImage(imgData, 'JPEG', margin, position + margin, imgWidth, imgHeight);
+            heightLeft -= contentHeight;
         }
 
         const safeProjectName = (window.projectName || 'project').replace(/[^a-z0-9]/gi, '_').toLowerCase();
